@@ -1,0 +1,150 @@
+# Configurable Cache Memory Simulator
+
+A command-line Python tool that simulates **direct-mapped** and **N-way set-associative** caches. It reads hexadecimal memory addresses from a text file, splits each address into tag / index / offset, and reports hits, misses, and hit rate.
+
+**Course:** Computer Architecture  
+**Members:** Comfort Akorfa Yikpa, Enock Yaw Sie  
+**Language:** Python 3 (standard library only)
+
+---
+
+## Features
+
+- Reads hexadecimal addresses from a text file (e.g. `0x1A2B`)
+- Decodes tag, index, and block offset with bitwise operations
+- Direct-mapped cache (`--ways 1`)
+- N-way set-associative cache with **LRU** replacement (`--ways N`)
+- Configurable cache size, block size, and number of ways
+- Reports total accesses, hits, misses, and hit rate
+
+---
+
+## Requirements
+
+- Python 3.7 or later
+- No third-party packages (uses `argparse`, `math`, and `collections` only)
+
+---
+
+## Project Structure
+
+```
+cache_memory_simulator/
+├── main.py                 # Command-line entry point
+├── constants.py            # Shared configuration constants
+├── address_decoder.py      # Tag / index / offset decoding
+├── cache.py                # Cache simulation with LRU
+├── input_reader.py         # Trace file loading and validation
+├── README.md               # This guide
+└── traces/
+    ├── sample_addresses.txt
+    ├── hand_verified.txt
+    └── associativity_demo.txt
+```
+
+---
+
+## How to Run
+
+Open a terminal in the project folder, then:
+
+### Direct-mapped cache (1 way)
+
+```bash
+python main.py --trace traces/sample_addresses.txt --cache-size 1024 --block-size 16 --ways 1
+```
+
+### 4-way set-associative cache
+
+```bash
+python main.py --trace traces/sample_addresses.txt --cache-size 1024 --block-size 16 --ways 4
+```
+
+### Verbose mode (show tag, index, offset per access)
+
+```bash
+python main.py -t traces/hand_verified.txt -c 64 -b 16 -w 1 --verbose
+```
+
+### Short option names
+
+| Option | Short | Meaning |
+|--------|-------|---------|
+| `--trace` | `-t` | Path to address trace file |
+| `--cache-size` | `-c` | Total cache size in bytes |
+| `--block-size` | `-b` | Block size in bytes |
+| `--ways` | `-w` | Associativity (1 = direct-mapped) |
+| `--verbose` | `-v` | Print each access decoded |
+
+---
+
+## Input File Format
+
+One hexadecimal address per line. Lines starting with `#` and blank lines are ignored.
+
+```
+0x1A2B
+0x00FF
+# this is a comment
+1A2B
+```
+
+Addresses may include or omit the `0x` prefix.
+
+---
+
+## Sample Output
+
+```
+==================================================
+  CACHE MEMORY SIMULATOR RESULTS
+==================================================
+  Mapping policy : Direct-Mapped
+  Cache size     : 1024 bytes
+  Block size     : 16 bytes
+  Ways           : 1
+  Number of sets : 64
+  Offset bits    : 4
+  Index bits     : 6
+--------------------------------------------------
+  Total accesses : 12
+  Hits           : 3
+  Misses         : 9
+  Hit rate       : 25.00%
+==================================================
+```
+
+Hit rate is calculated as:
+
+```
+Hit rate = (Hits / Total accesses) × 100%
+```
+
+---
+
+## Comparing Configurations
+
+Use the same trace with different `--ways` values to compare policies:
+
+```bash
+python main.py -t traces/associativity_demo.txt -c 64 -b 16 -w 1
+python main.py -t traces/associativity_demo.txt -c 64 -b 16 -w 2
+python main.py -t traces/associativity_demo.txt -c 64 -b 16 -w 4
+```
+
+---
+
+## Configuration Rules
+
+- Cache size and block size must be powers of 2
+- Cache size must be divisible by `(block size × ways)`
+- Number of sets = `cache size / (block size × ways)` must be a power of 2
+- `--ways 1` is direct-mapped; higher values use LRU within each set
+
+---
+
+## Scope (as in the project proposal)
+
+**Included:** CLI simulator, direct-mapped and N-way set-associative (LRU), hex traces, hit/miss statistics.
+
+**Not included:** GUI, multi-level caches, write policies, timing/power models, hardware design. All accesses are treated as reads.

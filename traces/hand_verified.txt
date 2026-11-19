@@ -1,0 +1,16 @@
+# Small trace for hand verification
+# Cache: 64 bytes, block size 16 bytes, ways 1 (direct-mapped)
+# -> 4 sets, offset_bits=4, index_bits=2
+#
+# Address 0x00 -> tag=0 index=0  MISS
+# Address 0x40 -> tag=1 index=0  MISS (conflict with 0x00)
+# Address 0x00 -> tag=0 index=0  MISS (was replaced)
+# Address 0x00 -> tag=0 index=0  HIT
+# Address 0x10 -> tag=0 index=1  MISS
+# Address 0x10 -> tag=0 index=1  HIT
+0x00
+0x40
+0x00
+0x00
+0x10
+0x10
