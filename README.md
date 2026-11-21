@@ -1,6 +1,8 @@
 # Configurable Cache Memory Simulator
 
-A command-line Python tool that simulates **direct-mapped** and **N-way set-associative** caches. It reads hexadecimal memory addresses from a text file, splits each address into tag / index / offset, and reports hits, misses, and hit rate.
+A Python tool that simulates **direct-mapped** and **N-way set-associative** caches. It reads hexadecimal memory addresses from a text file, splits each address into tag / index / offset, and reports hits, misses, and hit rate.
+
+Includes both a **command-line interface** and a **graphical user interface (GUI)**.
 
 **Course:** Computer Architecture  
 **Members:** Comfort Akorfa Yikpa, Enock Yaw Sie  
@@ -16,13 +18,14 @@ A command-line Python tool that simulates **direct-mapped** and **N-way set-asso
 - N-way set-associative cache with **LRU** replacement (`--ways N`)
 - Configurable cache size, block size, and number of ways
 - Reports total accesses, hits, misses, and hit rate
+- **GUI** to browse traces, set options, and view results / access log
 
 ---
 
 ## Requirements
 
 - Python 3.7 or later
-- No third-party packages (uses `argparse`, `math`, and `collections` only)
+- No third-party packages (uses `argparse`, `math`, `collections`, and `tkinter` only)
 
 ---
 
@@ -30,7 +33,9 @@ A command-line Python tool that simulates **direct-mapped** and **N-way set-asso
 
 ```
 cache_memory_simulator/
-├── main.py                 # Command-line entry point
+├── main.py                 # CLI + GUI launcher
+├── gui_app.py              # Graphical user interface
+├── simulation_runner.py    # Shared simulation helper
 ├── constants.py            # Shared configuration constants
 ├── address_decoder.py      # Tag / index / offset decoding
 ├── cache.py                # Cache simulation with LRU
@@ -46,15 +51,40 @@ cache_memory_simulator/
 
 ## How to Run
 
-Open a terminal in the project folder, then:
+Open a terminal in the project folder.
 
-### Direct-mapped cache (1 way)
+### Graphical interface (recommended for demos)
+
+```bash
+python main.py
+```
+
+or:
+
+```bash
+python main.py --gui
+```
+
+or:
+
+```bash
+python gui_app.py
+```
+
+In the GUI:
+
+1. Click **Browse** and choose a trace file (start with `traces/sample_addresses.txt`)
+2. Set cache size, block size, and ways
+3. Click **Run Simulation**
+4. Read hit rate / hits / misses and scroll the access log (HIT in green, MISS in red)
+
+### Command-line — direct-mapped (1 way)
 
 ```bash
 python main.py --trace traces/sample_addresses.txt --cache-size 1024 --block-size 16 --ways 1
 ```
 
-### 4-way set-associative cache
+### Command-line — 4-way set-associative
 
 ```bash
 python main.py --trace traces/sample_addresses.txt --cache-size 1024 --block-size 16 --ways 4
@@ -70,6 +100,7 @@ python main.py -t traces/hand_verified.txt -c 64 -b 16 -w 1 --verbose
 
 | Option | Short | Meaning |
 |--------|-------|---------|
+| `--gui` | | Open the graphical interface |
 | `--trace` | `-t` | Path to address trace file |
 | `--cache-size` | `-c` | Total cache size in bytes |
 | `--block-size` | `-b` | Block size in bytes |
@@ -93,7 +124,7 @@ Addresses may include or omit the `0x` prefix.
 
 ---
 
-## Sample Output
+## Sample CLI Output
 
 ```
 ==================================================
@@ -124,7 +155,7 @@ Hit rate = (Hits / Total accesses) × 100%
 
 ## Comparing Configurations
 
-Use the same trace with different `--ways` values to compare policies:
+Use the same trace with different `--ways` values (CLI or GUI) to compare policies:
 
 ```bash
 python main.py -t traces/associativity_demo.txt -c 64 -b 16 -w 1
@@ -143,8 +174,8 @@ python main.py -t traces/associativity_demo.txt -c 64 -b 16 -w 4
 
 ---
 
-## Scope (as in the project proposal)
+## Scope
 
-**Included:** CLI simulator, direct-mapped and N-way set-associative (LRU), hex traces, hit/miss statistics.
+**Included:** CLI + GUI simulator, direct-mapped and N-way set-associative (LRU), hex traces, hit/miss statistics and access log.
 
-**Not included:** GUI, multi-level caches, write policies, timing/power models, hardware design. All accesses are treated as reads.
+**Not included:** Multi-level caches, write policies, timing/power models, hardware design. All accesses are treated as reads.

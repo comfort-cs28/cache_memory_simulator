@@ -1,14 +1,13 @@
 """
 Configurable Cache Memory Simulator
 
-Command-line tool that simulates direct-mapped and N-way set-associative
-caches using hexadecimal memory address traces.
+Command-line and GUI tool that simulates direct-mapped and N-way
+set-associative caches using hexadecimal memory address traces.
 """
 
 import argparse
 import sys
 
-from cache import CacheSimulator
 from constants import (
     DEFAULT_BLOCK_SIZE,
     DEFAULT_CACHE_SIZE,
@@ -19,6 +18,7 @@ from constants import (
     HIT_RATE_DECIMALS,
 )
 from input_reader import read_trace_file
+from simulation_runner import run_simulation
 
 
 def build_parser():
@@ -30,9 +30,14 @@ def build_parser():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
+        "--gui",
+        action="store_true",
+        help="Open the graphical user interface instead of the CLI.",
+    )
+    parser.add_argument(
         "--trace",
         "-t",
-        required=True,
+        required=False,
         help="Path to a text file with one hexadecimal address per line.",
     )
     parser.add_argument(
@@ -90,36 +95,37 @@ def print_results(stats):
     print()
 
 
-def run_verbose(simulator, addresses):
-    """Simulate each access and print decoded fields."""
+def print_access_log(access_log):
+    """Print decoded fields for each access."""
     print()
-    print(
-        f"{'Address':<12} {'Tag':<10} {'Index':<8} {'Offset':<8} {'Result'}"
-    )
+    print(f"{'Address':<12} {'Tag':<10} {'Index':<8} {'Offset':<8} {'Result'}")
     print("-" * 50)
-    for address in addresses:
-        tag, index, offset = simulator.decoder.decode(address)
-        is_hit = simulator.access(address)
-        result = "HIT" if is_hit else "MISS"
+    for entry in access_log:
         print(
-            f"0x{address:08X}   "
-            f"{tag:<10} {index:<8} {offset:<8} {result}"
+            f"0x{entry['address']:08X}   "
+            f"{entry['tag']:<10} {entry['index']:<8} "
+            f"{entry['offset']:<8} {entry['result']}"
         )
-    return simulator.get_statistics()
 
 
 def main(argv=None):
     parser = build_parser()
     args = parser.parse_args(argv)
 
+    if args.gui or args.trace is None:
+        from gui_app import launch_gui
+
+        launch_gui()
+        return EXIT_SUCCESS
+
     try:
         addresses = read_trace_file(args.trace)
-        simulator = CacheSimulator(args.cache_size, args.block_size, args.ways)
+        stats, access_log = run_simulation(
+            args.cache_size, args.block_size, args.ways, addresses
+        )
 
         if args.verbose:
-            stats = run_verbose(simulator, addresses)
-        else:
-            stats = simulator.run(addresses)
+            print_access_log(access_log)
 
         print_results(stats)
         return EXIT_SUCCESS
