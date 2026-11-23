@@ -11,8 +11,8 @@ from tkinter import filedialog, messagebox, ttk
 from constants import (
     DEFAULT_BLOCK_SIZE,
     DEFAULT_CACHE_SIZE,
+    DEFAULT_TRACE_FILE_NAME,
     DEFAULT_WAYS,
-    DIRECT_MAPPED_WAYS,
     GUI_COLOR_BORDER,
     GUI_COLOR_CREAM,
     GUI_COLOR_GOLD,
@@ -39,9 +39,16 @@ from constants import (
     HIT_RATE_DECIMALS,
     RESULT_HIT,
     RESULT_MISS,
+    TRACES_FOLDER_NAME,
 )
-from input_reader import read_trace_file
+from input_reader import PROJECT_ROOT, read_trace_file
 from simulation_runner import run_simulation
+
+
+def default_trace_path():
+    """Absolute path to the default sample trace, if it exists."""
+    path = os.path.join(PROJECT_ROOT, TRACES_FOLDER_NAME, DEFAULT_TRACE_FILE_NAME)
+    return path if os.path.isfile(path) else ""
 
 
 class CacheSimulatorGUI:
@@ -54,11 +61,16 @@ class CacheSimulatorGUI:
         self.root.minsize(GUI_MIN_WIDTH, GUI_MIN_HEIGHT)
         self.root.configure(bg=GUI_COLOR_CREAM)
 
-        self.trace_path = tk.StringVar(value="")
+        starter_trace = default_trace_path()
+        self.trace_path = tk.StringVar(value=starter_trace)
         self.cache_size = tk.StringVar(value=str(DEFAULT_CACHE_SIZE))
         self.block_size = tk.StringVar(value=str(DEFAULT_BLOCK_SIZE))
         self.ways = tk.StringVar(value=str(DEFAULT_WAYS))
-        self.status_text = tk.StringVar(value="Load a trace file, set options, then Run Simulation.")
+        if starter_trace:
+            status = f"Ready. Default trace loaded: {DEFAULT_TRACE_FILE_NAME}"
+        else:
+            status = "Load a trace file, set options, then Run Simulation."
+        self.status_text = tk.StringVar(value=status)
 
         self.stat_vars = {
             "mapping_policy": tk.StringVar(value="—"),
@@ -308,9 +320,9 @@ class CacheSimulatorGUI:
         scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
 
     def _browse_trace(self):
-        initial_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "traces")
+        initial_dir = os.path.join(PROJECT_ROOT, TRACES_FOLDER_NAME)
         if not os.path.isdir(initial_dir):
-            initial_dir = os.path.dirname(os.path.abspath(__file__))
+            initial_dir = PROJECT_ROOT
 
         file_path = filedialog.askopenfilename(
             title="Select memory address trace",

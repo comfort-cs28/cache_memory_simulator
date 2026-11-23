@@ -58,3 +58,7 @@ GUI_CURSOR_POINTER = "hand2"
 
 # Common ways choices shown in the GUI dropdown
 GUI_WAYS_OPTIONS = (1, 2, 4, 8, 16)
+
+# Sample traces folder / default demo file
+TRACES_FOLDER_NAME = "traces"
+DEFAULT_TRACE_FILE_NAME = "hand_verified.txt"
