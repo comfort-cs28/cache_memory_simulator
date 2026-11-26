@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cache Memory Simulator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>Cache Memory Simulator</h1>
+      <p>Direct-Mapped &amp; N-Way Set-Associative (LRU)</p>
+    </div>
+  </header>
+  <div class="gold-line"></div>
+
+  <main class="layout">
+    <section class="card config">
+      <h2>Configuration</h2>
+
+      <label for="trace_select">Sample trace</label>
+      <select id="trace_select"></select>
+
+      <label for="trace_file">Or upload a .txt trace</label>
+      <input id="trace_file" type="file" accept=".txt,text/plain" />
+
+      <label for="cache_size">Cache size (bytes)</label>
+      <input id="cache_size" type="number" value="1024" min="1" />
+
+      <label for="block_size">Block size (bytes)</label>
+      <input id="block_size" type="number" value="16" min="1" />
+
+      <label for="ways">Ways (1 = direct-mapped)</label>
+      <select id="ways">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="4" selected>4</option>
+        <option value="8">8</option>
+        <option value="16">16</option>
+      </select>
+
+      <button id="run_btn" type="button">Run Simulation</button>
+      <button id="clear_btn" type="button" class="secondary">Clear Results</button>
+      <p id="status" class="status">Choose a trace and click Run Simulation.</p>
+    </section>
+
+    <section class="results">
+      <div class="card">
+        <h2>Results</h2>
+        <div class="stats">
+          <div><span class="label">Hit Rate</span><strong id="stat_hit_rate">0.00%</strong></div>
+          <div><span class="label">Hits</span><strong id="stat_hits">0</strong></div>
+          <div><span class="label">Misses</span><strong id="stat_misses">0</strong></div>
+          <div><span class="label">Accesses</span><strong id="stat_accesses">0</strong></div>
+          <div><span class="label">Sets</span><strong id="stat_sets">—</strong></div>
+          <div><span class="label">Policy</span><strong id="stat_policy">—</strong></div>
+        </div>
+        <p class="meta">
+          Offset bits: <span id="stat_offset_bits">—</span>
+          &nbsp;|&nbsp;
+          Index bits: <span id="stat_index_bits">—</span>
+        </p>
+      </div>
+
+      <div class="card log-card">
+        <h2>Access Log</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Address</th>
+                <th>Tag</th>
+                <th>Index</th>
+                <th>Offset</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody id="log_body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Computer Architecture Project · Comfort Akorfa Yikpa · Enock Yaw Sie
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
